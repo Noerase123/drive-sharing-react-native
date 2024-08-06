@@ -97,7 +97,7 @@ export const CustomBottomSheet = ({
 
   const handleArrivedBooking = () => {
     dispatch(setPickedUp());
-    getMarkerPosition(location.selectedCustomerLocation);
+    getMarkerPosition(rideDetails.pickupLocation);
   };
 
   const handleStartDrive = () => {

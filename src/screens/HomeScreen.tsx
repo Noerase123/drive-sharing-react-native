@@ -90,6 +90,15 @@ export function HomeScreen() {
     });
   };
 
+  const handlePickedUpBooking = () => {
+    mapRef.current?.animateToRegion({
+      latitude: rideDetails.pickupLocation.latitude,
+      longitude: rideDetails.pickupLocation.longitude,
+      latitudeDelta: 0.001,
+      longitudeDelta: 0.001,
+    });
+  };
+
   const handleCompletedBooking = () => {
     mapRef.current?.animateToRegion({
       latitude: rideDetails.destination.latitude,
@@ -131,8 +140,11 @@ export function HomeScreen() {
       case 'accepted':
         handleProcessBooking();
         break;
-      case 'picked-up':
+      case 'started':
         handleDriveBooking();
+        break;
+      case 'picked-up':
+        handlePickedUpBooking();
         break;
       case 'dropped-off':
         handleDroppedOffBooking();
