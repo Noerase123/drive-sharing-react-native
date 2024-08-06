@@ -14,10 +14,11 @@ export type TMockData = {
   expectedArrivalTime: string;
   status:
     | 'pending'
-    | 'acepted'
+    | 'accepted'
     | 'declined'
     | 'started'
     | 'picked-up'
+    | 'completed'
     | 'dropped-off';
   pickupTime: string;
   timestamp: string;

@@ -11,7 +11,7 @@ const rideRequestDetailsSlice = createSlice({
   reducers: {
     setData(state: TMockData, action: PayloadAction<TMockData>) {
       return {...state, ...action.payload};
-    },
+    }
   },
 });
 

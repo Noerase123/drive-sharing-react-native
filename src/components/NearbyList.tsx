@@ -1,16 +1,8 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Dimensions,
-} from 'react-native';
+import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import React from 'react';
 import {mockData} from '../mockData';
 import {ItemListDetails} from './ItemListDetails';
 import {TMockData} from '../types/MockData';
-
-const height = Dimensions.get('window').height;
 
 type Props = {
   onPress: (data: TMockData) => () => void;

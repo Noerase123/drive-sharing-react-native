@@ -1,5 +1,5 @@
 import {View, Platform, Dimensions, Text, Image} from 'react-native';
-import React, {useRef, useState, useLayoutEffect} from 'react';
+import React, {useRef, useState, useLayoutEffect, useEffect} from 'react';
 import MapView, {
   Callout,
   Circle,
@@ -13,15 +13,21 @@ import {mockData} from '../mockData';
 import {TCoordinates, TMockData} from '../types/MockData';
 import MapViewDirections from 'react-native-maps-directions';
 import {useNavigate} from '../hooks/useNavigation';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch} from '../store';
-import {setData} from '../store/reducers/RideRequestDetailsSlice';
+import {getDetails, setData} from '../store/reducers/RideRequestDetailsSlice';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {deltaCoordinates} from '../constants';
+import {
+  getLocation,
+  setCurrentLocation,
+  setSelectedCustomerLocation,
+} from '../store/reducers/LocationSlice';
+import {getStatus} from '../store/reducers/ProcessBookingSlice';
 
 const screenHeight = Dimensions.get('window').height;
 
-const GOOGLE_PLACES_API_KEY = '...';
+const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
 export function HomeScreen() {
   const navigation = useNavigate();
@@ -29,6 +35,9 @@ export function HomeScreen() {
   const [openDirections, setOpenDirections] = useState(false);
   const [snapPoint, setSnapPoint] = useState(0);
   const mapRef = useRef<MapView>(null);
+  const location = useSelector(getLocation);
+  const rideDetails = useSelector(getDetails);
+  const {status} = useSelector(getStatus);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -37,13 +46,6 @@ export function HomeScreen() {
     });
   }, []);
 
-  const [coor, setCoor] = useState({
-    latitude: 0,
-    longitude: 0,
-    latitudeDelta: 0,
-    longitudeDelta: 0,
-  });
-
   const getPosition = () => {
     Geolocation.getCurrentPosition(loc => {
       mapRef.current?.animateToRegion({
@@ -51,25 +53,13 @@ export function HomeScreen() {
         longitude: loc.coords.longitude,
         ...deltaCoordinates,
       });
-      setCoor({
-        latitude: loc.coords.latitude,
-        longitude: loc.coords.longitude,
-        ...deltaCoordinates,
-      });
+      dispatch(setCurrentLocation(loc.coords));
     });
   };
 
   const getMarkerPosition = (coors: TCoordinates) => {
+    dispatch(setSelectedCustomerLocation(coors));
     setOpenDirections(true);
-    setSnapPoint(1);
-    mapRef.current?.animateToRegion({
-      latitude: coors.latitude,
-      longitude: coors.longitude,
-      ...deltaCoordinates,
-    });
-  };
-
-  const getMarkerDestination = (coors: TCoordinates) => {
     mapRef.current?.animateToRegion({
       latitude: coors.latitude,
       longitude: coors.longitude,
@@ -81,6 +71,77 @@ export function HomeScreen() {
     dispatch(setData(data));
     navigation.navigate('RideRequestDetails');
   };
+
+  const handleDriveBooking = () => {
+    const {pickupLocation, destination} = rideDetails;
+    mapRef.current?.animateToRegion({
+      ...pickupLocation,
+      ...deltaCoordinates,
+    });
+    mapRef.current?.fitToCoordinates([pickupLocation, destination], {
+      edgePadding: {
+        top: 75,
+        bottom: 75,
+        left: 75,
+        right: 75,
+      },
+    });
+  };
+
+  const handleCompletedBooking = () => {
+    mapRef.current?.animateToRegion({
+      latitude: rideDetails.destination.latitude,
+      longitude: rideDetails.destination.longitude,
+      latitudeDelta: 0.02,
+      longitudeDelta: 0.02,
+    });
+  };
+
+  const handleDroppedOffBooking = () => {
+    mapRef.current?.animateToRegion({
+      latitude: rideDetails.destination.latitude,
+      longitude: rideDetails.destination.longitude,
+      latitudeDelta: 0.001,
+      longitudeDelta: 0.001,
+    });
+  };
+
+  const handleProcessBooking = () => {
+    mapRef.current?.animateToRegion(location.selectedCustomerLocation);
+    mapRef.current?.fitToCoordinates(
+      [location.currentLocation, location.selectedCustomerLocation],
+      {
+        edgePadding: {
+          top: 75,
+          bottom: 75,
+          left: 75,
+          right: 75,
+        },
+      },
+    );
+  };
+
+  useEffect(() => {
+    if (status === 'accepted') {
+      handleProcessBooking();
+    }
+    switch (status) {
+      case 'accepted':
+        handleProcessBooking();
+        break;
+      case 'picked-up':
+        handleDriveBooking();
+        break;
+      case 'dropped-off':
+        handleDroppedOffBooking();
+        break;
+      case 'completed':
+        handleCompletedBooking();
+        break;
+      default:
+        break;
+    }
+  }, [status]);
 
   return (
     <BottomSheetModalProvider>
@@ -97,7 +158,7 @@ export function HomeScreen() {
             height: screenHeight - (Platform.OS === 'android' ? 150 : 190),
           }}>
           <Circle
-            center={coor}
+            center={location.currentLocation}
             radius={500}
             strokeWidth={2}
             strokeColor="#82eedd"
@@ -105,18 +166,17 @@ export function HomeScreen() {
           />
           {mockData.map((data, idx) => (
             <View key={idx}>
-              {/* {openDirections && (
-              <MapViewDirections
-                origin={data.pickupLocation}
-                destination={data.destination}
-                apikey={GOOGLE_PLACES_API_KEY}
-                strokeColor="hotpink"
-                strokeWidth={4}
-              />
-            )} */}
+              {openDirections && (
+                <MapViewDirections
+                  origin={data.pickupLocation}
+                  destination={data.destination}
+                  apikey={GOOGLE_PLACES_API_KEY}
+                  strokeColor="hotpink"
+                  strokeWidth={4}
+                />
+              )}
               <Marker
                 coordinate={data.pickupLocation}
-                onPress={() => getMarkerDestination(data.pickupLocation)}
                 pinColor="#89CFF0"
                 identifier={'pickupLocation'}>
                 <Callout onPress={handleCallout(data)}>
@@ -137,7 +197,9 @@ export function HomeScreen() {
                 identifier={'destination'}>
                 <Callout>
                   <View>
-                    <Text className="text-black">{data.destinationAddress}</Text>
+                    <Text className="text-black">
+                      {data.destinationAddress}
+                    </Text>
                     <View className="flex-row justify-center">
                       <Image
                         source={require('../assets/images/building.png')}

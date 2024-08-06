@@ -37,18 +37,17 @@ export const CustomerDetails = ({
 
   return (
     <View>
-      <View className="px-3 flex-row items-center gap-2">
+      <View className="px-3 flex-row items-center justify-between gap-2">
         <TouchableOpacity onPress={onBack}>
-          <View className="flex-row items-center px-4 py-2">
+          <View className="flex-row items-center">
             <BackIcon />
             <Text className="text-[15px] text-gray-600">back</Text>
           </View>
         </TouchableOpacity>
+        <Text className="text-black text-xl font-medium">{data.userId}</Text>
         <TouchableOpacity onPress={onDetails}>
-          <View className="flex-row justify-between items-center gap-1">
-            <Text className="text-black text-2xl font-medium">
-              {data.userId}
-            </Text>
+          <View className="rotate-180 px-4">
+            <BackIcon />
           </View>
         </TouchableOpacity>
       </View>
@@ -57,11 +56,15 @@ export const CustomerDetails = ({
           {mapValues.map((value, idx) => (
             <View key={idx} className="w-full">
               <Text className="text-md text-gray-400">{value.label}</Text>
-              <Text className="text-lg text-black">{value.value}</Text>
+              <Text className="text-lg text-black">
+                {value.value.length < 40
+                  ? value.value
+                  : `${value.value.substring(0, 40)}...`}
+              </Text>
             </View>
           ))}
           <TouchableOpacity onPress={onConfirmBooking}>
-            <View className="bg-blue-300 p-4 rounded-full items-center">
+            <View className="border-2 border-[#5e80a6] bg-blue-300 p-4 rounded-full items-center">
               <Text className="text-black font-medium">Confirm Booking</Text>
             </View>
           </TouchableOpacity>

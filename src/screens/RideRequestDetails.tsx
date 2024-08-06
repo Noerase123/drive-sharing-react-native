@@ -67,7 +67,7 @@ export function RideRequestDetails() {
   ];
 
   return (
-    <ScrollView>
+    <ScrollView className="bg-white">
       <MapView
         followsUserLocation
         showsUserLocation

@@ -1,19 +1,35 @@
-import React, {useCallback, useRef, useEffect, useState} from 'react';
-import {View, Text, FlatList, TouchableOpacity} from 'react-native';
+import React, {useCallback, useRef, useEffect, useState, useMemo} from 'react';
+import {View, Text, TouchableOpacity} from 'react-native';
 import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
-import {mockData} from '../mockData';
 import {TMockData} from '../types/MockData';
 import {CustomerDetails} from './CustomerDetails';
-import {ItemListDetails} from './ItemListDetails';
 import {useNavigate} from '../hooks/useNavigation';
-import {useDispatch} from 'react-redux';
-import {setData} from '../store/reducers/RideRequestDetailsSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {getDetails, setData} from '../store/reducers/RideRequestDetailsSlice';
 import NearbyList from './NearbyList';
+import {
+  getStatus,
+  setAccepted,
+  setCompleted,
+  setDroppedOff,
+  setPending,
+  setPickedUp,
+  setStarted,
+} from '../store/reducers/ProcessBookingSlice';
+import {capitalize} from '../utils/string';
+import {getLocation} from '../store/reducers/LocationSlice';
+import {
+  PhoneIcon,
+  MessageIcon,
+  RouteIcon,
+  InfoIcon,
+  ChevUpIcon,
+} from '../assets/icons';
 
 export type Props = {
   getMarkerPosition: (props: TMockData['pickupLocation']) => void;
-  snapPoint: number;
   setSnapPoint: (payload: any) => void;
+  snapPoint: number;
 };
 
 export const CustomBottomSheet = ({
@@ -23,10 +39,15 @@ export const CustomBottomSheet = ({
 }: Props) => {
   const navigation = useNavigate();
   const dispatch = useDispatch();
+  const rideDetails = useSelector(getDetails);
+  const {status} = useSelector(getStatus);
+  const location = useSelector(getLocation);
+
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<
     TMockData | undefined
   >(undefined);
+  const [booked, setBooked] = useState(false);
 
   useEffect(() => {
     bottomSheetModalRef.current?.present();
@@ -46,6 +67,8 @@ export const CustomBottomSheet = ({
 
   const handleCustomer = (data: TMockData) => () => {
     getMarkerPosition(data.pickupLocation);
+    setSnapPoint(1);
+    dispatch(setData(data));
     setSelectedCustomer(data);
   };
 
@@ -59,46 +82,198 @@ export const CustomBottomSheet = ({
   };
 
   const handleConfirmBooking = () => {
-    console.log('testing');
-  }
+    setSnapPoint(2);
+    dispatch(setAccepted());
+    setBooked(true);
+  };
+
+  const handleCancelBooking = () => {
+    setSnapPoint(1);
+    dispatch(setPending());
+    setBooked(false);
+    setSelectedCustomer(undefined);
+    getMarkerPosition(rideDetails.pickupLocation);
+  };
+
+  const handleArrivedBooking = () => {
+    dispatch(setPickedUp());
+    getMarkerPosition(location.selectedCustomerLocation);
+  };
+
+  const handleStartDrive = () => {
+    dispatch(setStarted());
+  };
+
+  const handleDroppedOff = () => {
+    dispatch(setDroppedOff());
+    getMarkerPosition(rideDetails.destination);
+  };
+
+  const handleCompleted = () => {
+    dispatch(setCompleted());
+    setSelectedCustomer(undefined);
+    setBooked(false);
+  };
+
+  const mapIcons = [
+    {
+      icon: <PhoneIcon />,
+      onPress: () => {},
+    },
+    {
+      icon: <MessageIcon />,
+      onPress: () => {},
+    },
+    {
+      icon: <RouteIcon />,
+      onPress: () => {},
+    },
+    {
+      icon: <InfoIcon />,
+      onPress: () => navigation.navigate('RideRequestDetails'),
+    },
+  ];
+
+  const renderStatusButton = useMemo(() => {
+    switch (status) {
+      case 'accepted':
+        return (
+          <View className="flex-row justify-between">
+            <TouchableOpacity
+              className="mt-4 w-2/3"
+              onPress={handleArrivedBooking}>
+              <View className="border-2 border-[#147538] bg-green-500 p-4 rounded-full items-center">
+                <Text className="text-white font-medium">Arrived</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="mt-4 w-[110px]"
+              onPress={handleCancelBooking}>
+              <View className="border-2 border-[#962a2a] bg-red-500 p-4 rounded-full items-center">
+                <Text className="text-white font-medium">Cancel</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        );
+      case 'picked-up':
+        return (
+          <View className="flex-row justify-between">
+            <TouchableOpacity className="mt-4 w-2/3" onPress={handleStartDrive}>
+              <View className="border-2 border-[#5e80a6] bg-blue-400 p-4 rounded-full items-center">
+                <Text className="text-white font-medium">Drive</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="mt-4 w-[110px]"
+              onPress={handleCancelBooking}>
+              <View className="border-2 border-[#962a2a] bg-red-500 p-4 rounded-full items-center">
+                <Text className="text-white font-medium">Cancel</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        );
+      case 'started':
+        return (
+          <TouchableOpacity className="mt-4 w-full" onPress={handleDroppedOff}>
+            <View className="border-2 border-[#147538] bg-green-500 p-4 rounded-full items-center">
+              <Text className="text-white font-medium">Dropped-off</Text>
+            </View>
+          </TouchableOpacity>
+        );
+      case 'dropped-off':
+        return (
+          <TouchableOpacity className="mt-4 w-full" onPress={handleCompleted}>
+            <View className="border-2 border-[#147538] bg-green-500 p-4 rounded-full items-center">
+              <Text className="text-white font-medium">Complete </Text>
+            </View>
+          </TouchableOpacity>
+        );
+      default:
+        break;
+    }
+  }, [status]);
+
+  const renderSheet = useMemo(() => {
+    if (booked) {
+      return (
+        <View className="px-4">
+          <View className="flex-row justify-between items-center mb-2">
+            <Text className="text-black text-lg">
+              Booked for {rideDetails.userId}
+            </Text>
+            <View className="border p-2 rounded-md bg-green-500 border-green-700">
+              <Text className="text-white text-md font-bold">
+                {capitalize(status)}
+              </Text>
+            </View>
+          </View>
+          <View className="flex-row justify-between">
+            {mapIcons.map((data, idx) => (
+              <TouchableOpacity key={idx} onPress={data.onPress}>
+                <View className="border-2 p-4 rounded-full">{data.icon}</View>
+              </TouchableOpacity>
+            ))}
+          </View>
+          {renderStatusButton}
+        </View>
+      );
+    }
+    if (selectedCustomer) {
+      return (
+        <CustomerDetails
+          onConfirmBooking={handleConfirmBooking}
+          onDetails={handleNavigateDetails(selectedCustomer)}
+          onBack={handleBack}
+          data={selectedCustomer}
+        />
+      );
+    } else {
+      return <NearbyList onPress={handleCustomer} />;
+    }
+  }, [selectedCustomer, status]);
+
+  const renderButtonSheet = useMemo(() => {
+    if (booked) {
+      return (
+        <View className="pt-2 pb-5 flex-col items-center justify-center">
+          <ChevUpIcon />
+          <Text className="text-black font-medium text-2xl px-5">
+            View Details
+          </Text>
+        </View>
+      );
+    } else if (selectedCustomer) {
+      return (
+        <View className="p-5">
+          <CustomerDetails
+            onConfirmBooking={handleConfirmBooking}
+            onDetails={handleNavigateDetails(selectedCustomer)}
+            onBack={handleBack}
+            data={selectedCustomer}
+          />
+        </View>
+      );
+    }
+    return (
+      <View className="p-5 flex-row justify-center">
+        <Text className="text-black font-medium text-2xl px-5">
+          Select Nearby
+        </Text>
+      </View>
+    );
+  }, [selectedCustomer, status]);
 
   return (
     <View>
       <TouchableOpacity className="bg-white" onPress={handlePresentModalPress}>
-        {selectedCustomer ? (
-          <View className="mt-5">
-            <CustomerDetails
-              onConfirmBooking={handleConfirmBooking}
-              onBack={() => setSelectedCustomer(undefined)}
-              onDetails={handleNavigateDetails(selectedCustomer)}
-              data={selectedCustomer}
-            />
-          </View>
-        ) : (
-          <View className="p-5 flex-row justify-center">
-            <Text className="text-black font-medium text-2xl px-5">
-              Select Nearby
-            </Text>
-          </View>
-        )}
+        {renderButtonSheet}
       </TouchableOpacity>
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={snapPoint}
-        snapPoints={['25%', '53%']}
+        snapPoints={['30%', '53%', '35%']}
         onChange={handleSheetChanges}>
-        <BottomSheetView className="flex-1">
-          {selectedCustomer ? (
-            <CustomerDetails
-              onConfirmBooking={handleConfirmBooking}
-              onDetails={handleNavigateDetails(selectedCustomer)}
-              onBack={handleBack}
-              data={selectedCustomer}
-            />
-          ) : (
-            <NearbyList onPress={handleCustomer} />
-          )}
-        </BottomSheetView>
+        <BottomSheetView className="flex-1">{renderSheet}</BottomSheetView>
       </BottomSheetModal>
     </View>
   );
