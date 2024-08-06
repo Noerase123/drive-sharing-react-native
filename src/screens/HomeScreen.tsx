@@ -9,7 +9,6 @@ import MapView, {
 } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import {CustomBottomSheet} from '../components/BottomSheet';
-import {mockData} from '../mockData';
 import {TCoordinates, TMockData} from '../types/MockData';
 import MapViewDirections from 'react-native-maps-directions';
 import {useNavigate} from '../hooks/useNavigation';
@@ -24,6 +23,7 @@ import {
   setSelectedCustomerLocation,
 } from '../store/reducers/LocationSlice';
 import {getStatus} from '../store/reducers/ProcessBookingSlice';
+import {useLocationServiceAPI} from '../services/locationService';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -38,6 +38,8 @@ export function HomeScreen() {
   const location = useSelector(getLocation);
   const rideDetails = useSelector(getDetails);
   const {status} = useSelector(getStatus);
+
+  const locationData = useLocationServiceAPI();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -164,7 +166,7 @@ export function HomeScreen() {
             strokeColor="#82eedd"
             fillColor="#82eedd4d"
           />
-          {mockData.map((data, idx) => (
+          {locationData.map((data, idx) => (
             <View key={idx}>
               {openDirections && (
                 <MapViewDirections
