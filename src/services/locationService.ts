@@ -1,6 +1,9 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {mockData} from '../mockData';
 import {TMockData} from '../types/MockData';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch} from '../store';
+import {getList, setList} from '../store/reducers/NearbySlice';
 
 const locationService = () => {
   return new Promise(resolve => {
@@ -9,16 +12,17 @@ const locationService = () => {
 };
 
 export const useLocationServiceAPI = () => {
-  const [data, setData] = useState<TMockData[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const listData = useSelector(getList);
 
   const fetchAPI = async () => {
     const response = await locationService();
-    setData(response as TMockData[]);
+    dispatch(setList(response as TMockData[]));
   };
 
   useEffect(() => {
     fetchAPI();
   }, []);
 
-  return data;
+  return listData;
 };

@@ -2,6 +2,7 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import {BackIcon} from '../assets/icons/BackIcon';
 import {TMockData} from '../types/MockData';
 import React from 'react';
+import {subStrValue} from '../utils/string';
 
 type TCustomerDetails = {
   onBack: () => void;
@@ -57,9 +58,7 @@ export const CustomerDetails = ({
             <View key={idx} className="w-full">
               <Text className="text-md text-gray-400">{value.label}</Text>
               <Text className="text-lg text-black">
-                {value.value.length < 40
-                  ? value.value
-                  : `${value.value.substring(0, 40)}...`}
+                {subStrValue(value.value, 40)}
               </Text>
             </View>
           ))}

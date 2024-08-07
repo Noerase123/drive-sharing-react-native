@@ -3,6 +3,15 @@ export type TCoordinates = {
   longitude: number;
 };
 
+export type TStatus =
+  | 'pending'
+  | 'accepted'
+  | 'declined'
+  | 'started'
+  | 'picked-up'
+  | 'completed'
+  | 'dropped-off';
+
 export type TMockData = {
   id: string;
   userId: string;
@@ -12,14 +21,7 @@ export type TMockData = {
   destination: TCoordinates;
   destinationAddress: string;
   expectedArrivalTime: string;
-  status:
-    | 'pending'
-    | 'accepted'
-    | 'declined'
-    | 'started'
-    | 'picked-up'
-    | 'completed'
-    | 'dropped-off';
+  status: TStatus;
   pickupTime: string;
   timestamp: string;
 };

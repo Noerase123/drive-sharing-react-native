@@ -17,7 +17,6 @@ import {
   setStarted,
 } from '../store/reducers/ProcessBookingSlice';
 import {capitalize} from '../utils/string';
-import {getLocation} from '../store/reducers/LocationSlice';
 import {
   PhoneIcon,
   MessageIcon,
@@ -25,28 +24,36 @@ import {
   InfoIcon,
   ChevUpIcon,
 } from '../assets/icons';
+import {
+  changeStatus,
+  refreshList,
+  removeData,
+  selectedDrive,
+} from '../store/reducers/NearbySlice';
 
 export type Props = {
   getMarkerPosition: (props: TMockData['pickupLocation']) => void;
   setSnapPoint: (payload: any) => void;
   snapPoint: number;
+  selectedCustomer: undefined;
+  setSelectedCustomer: (payload: any) => void;
 };
 
 export const CustomBottomSheet = ({
   getMarkerPosition,
   snapPoint,
   setSnapPoint,
+  selectedCustomer,
+  setSelectedCustomer,
 }: Props) => {
   const navigation = useNavigate();
   const dispatch = useDispatch();
   const rideDetails = useSelector(getDetails);
   const {status} = useSelector(getStatus);
-  const location = useSelector(getLocation);
+
+  console.log('rideDetails', rideDetails);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const [selectedCustomer, setSelectedCustomer] = useState<
-    TMockData | undefined
-  >(undefined);
   const [booked, setBooked] = useState(false);
 
   useEffect(() => {
@@ -85,6 +92,7 @@ export const CustomBottomSheet = ({
     setSnapPoint(2);
     dispatch(setAccepted());
     setBooked(true);
+    dispatch(selectedDrive(rideDetails));
   };
 
   const handleCancelBooking = () => {
@@ -93,6 +101,7 @@ export const CustomBottomSheet = ({
     setBooked(false);
     setSelectedCustomer(undefined);
     getMarkerPosition(rideDetails.pickupLocation);
+    dispatch(refreshList());
   };
 
   const handleArrivedBooking = () => {
@@ -102,15 +111,23 @@ export const CustomBottomSheet = ({
 
   const handleStartDrive = () => {
     dispatch(setStarted());
+    dispatch(
+      changeStatus({
+        id: rideDetails.id,
+        status: 'started',
+      }),
+    );
   };
 
   const handleDroppedOff = () => {
     dispatch(setDroppedOff());
     getMarkerPosition(rideDetails.destination);
+    dispatch(refreshList());
   };
 
   const handleCompleted = () => {
     dispatch(setCompleted());
+    dispatch(removeData(rideDetails));
     setSelectedCustomer(undefined);
     setBooked(false);
   };
