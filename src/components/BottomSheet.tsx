@@ -25,17 +25,17 @@ import {
   ChevUpIcon,
 } from '../assets/icons';
 import {
-  changeStatus,
   refreshList,
   removeData,
   selectedDrive,
 } from '../store/reducers/NearbySlice';
+import {setDialog} from '../store/reducers/DialogSlice';
 
 export type Props = {
   getMarkerPosition: (props: TMockData['pickupLocation']) => void;
   setSnapPoint: (payload: any) => void;
   snapPoint: number;
-  selectedCustomer: undefined;
+  selectedCustomer: TMockData | undefined;
   setSelectedCustomer: (payload: any) => void;
 };
 
@@ -51,8 +51,6 @@ export const CustomBottomSheet = ({
   const rideDetails = useSelector(getDetails);
   const {status} = useSelector(getStatus);
 
-  console.log('rideDetails', rideDetails);
-
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [booked, setBooked] = useState(false);
 
@@ -64,7 +62,6 @@ export const CustomBottomSheet = ({
     bottomSheetModalRef.current?.present();
   }, []);
   const handleSheetChanges = (index: number) => {
-    console.log('handleSheetChanges', index);
     if (index === 1) {
       setSnapPoint(1);
     } else if (index === 0) {
@@ -89,13 +86,29 @@ export const CustomBottomSheet = ({
   };
 
   const handleConfirmBooking = () => {
+    dispatch(
+      setDialog({
+        isVisible: true,
+        title: 'Ride accepted',
+        color: 'bg-green-500',
+        description: 'Customer will be notify about the confirmation.',
+      }),
+    );
     setSnapPoint(2);
     dispatch(setAccepted());
     setBooked(true);
-    dispatch(selectedDrive(rideDetails));
   };
 
-  const handleCancelBooking = () => {
+  const handleCancelBooking = async () => {
+    dispatch(removeData(rideDetails));
+    dispatch(
+      setDialog({
+        isVisible: true,
+        title: 'Ride cancelled',
+        color: 'bg-red-500',
+        description: 'Customer will be notify about the cancellation.',
+      }),
+    );
     setSnapPoint(1);
     dispatch(setPending());
     setBooked(false);
@@ -110,11 +123,14 @@ export const CustomBottomSheet = ({
   };
 
   const handleStartDrive = () => {
+    dispatch(selectedDrive(rideDetails));
     dispatch(setStarted());
     dispatch(
-      changeStatus({
-        id: rideDetails.id,
-        status: 'started',
+      setDialog({
+        isVisible: true,
+        title: 'Ride started',
+        color: 'bg-blue-400',
+        description: "Let's go to your destination!",
       }),
     );
   };
@@ -126,6 +142,15 @@ export const CustomBottomSheet = ({
   };
 
   const handleCompleted = () => {
+    dispatch(
+      setDialog({
+        isVisible: true,
+        title: 'Ride completed',
+        color: 'bg-green-500',
+        description:
+          'Ride has completed. Customer will give a feedback accordingly.',
+      }),
+    );
     dispatch(setCompleted());
     dispatch(removeData(rideDetails));
     setSelectedCustomer(undefined);

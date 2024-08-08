@@ -63,8 +63,8 @@ export const CustomerDetails = ({
             </View>
           ))}
           <TouchableOpacity onPress={onConfirmBooking}>
-            <View className="border-2 border-[#5e80a6] bg-blue-300 p-4 rounded-full items-center">
-              <Text className="text-black font-medium">Confirm Booking</Text>
+            <View className="border-2 border-green-900 bg-green-600 p-4 rounded-full items-center">
+              <Text className="text-white font-medium">Confirm Booking</Text>
             </View>
           </TouchableOpacity>
         </View>

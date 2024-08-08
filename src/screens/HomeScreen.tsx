@@ -1,5 +1,12 @@
-import {View, Platform, Dimensions, Text, Image} from 'react-native';
-import React, {useRef, useState, useLayoutEffect, useEffect} from 'react';
+import {
+  View,
+  Platform,
+  Dimensions,
+  Text,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useRef, useState, useLayoutEffect} from 'react';
 import MapView, {
   Callout,
   Circle,
@@ -12,9 +19,8 @@ import {CustomBottomSheet} from '../components/BottomSheet';
 import {TCoordinates, TMockData} from '../types/MockData';
 import MapViewDirections from 'react-native-maps-directions';
 import {useNavigate} from '../hooks/useNavigation';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch} from '../store';
-import {setData} from '../store/reducers/RideRequestDetailsSlice';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {deltaCoordinates} from '../constants';
 import {
@@ -23,6 +29,9 @@ import {
 } from '../store/reducers/LocationSlice';
 import {useLocationServiceAPI} from '../services/locationService';
 import {useBooking} from '../hooks/useBooking';
+import Modal from 'react-native-modal';
+import {getDialog, removeDialog} from '../store/reducers/DialogSlice';
+import {cn} from '../utils';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -37,6 +46,7 @@ export function HomeScreen() {
   >(undefined);
   const [snapPoint, setSnapPoint] = useState(0);
   const mapRef = useRef<MapView>(null);
+  const {isVisible, color, title, description} = useSelector(getDialog);
 
   const location = useBooking({mapRef});
   const rideList = useLocationServiceAPI();
@@ -76,6 +86,10 @@ export function HomeScreen() {
   const setCustomer = (data: TMockData) => {
     setSelectedCustomer(data);
     setSnapPoint(1);
+  };
+
+  const handleRemoveDialog = () => {
+    dispatch(removeDialog());
   };
 
   return (
@@ -155,6 +169,33 @@ export function HomeScreen() {
           selectedCustomer={selectedCustomer}
           setSelectedCustomer={setSelectedCustomer}
         />
+        <Modal isVisible={isVisible}>
+          <View className="bg-white rounded-lg overflow-hidden">
+            <View className={cn('bg-blue-500 px-5 py-3', color)}>
+              <Text className="text-xl text-white font-bold">
+                {title || 'Cancel the booking'}
+              </Text>
+            </View>
+            <View className="p-5">
+              <Text className="text-lg text-gray-500">
+                {description || 'Are you sure you want to cancel booking?'}
+              </Text>
+              <View className="w-full mt-5">
+                <TouchableOpacity onPress={handleRemoveDialog}>
+                  <View
+                    className={cn(
+                      'bg-blue-500 px-10 py-2 rounded-full',
+                      color,
+                    )}>
+                    <Text className="text-xl text-white font-bold text-center">
+                      Ok
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </BottomSheetModalProvider>
   );

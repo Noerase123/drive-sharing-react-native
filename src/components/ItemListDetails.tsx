@@ -9,7 +9,7 @@ type TItemProps = {
 };
 
 export const ItemListDetails = ({data, distance}: TItemProps) => (
-  <View className="border-2 border-[#5e80a6] bg-blue-300 mb-3 mx-5 p-3 rounded-md">
+  <View className="border-2 border-[#5e80a6] bg-blue-200 mb-3 mx-5 p-3 rounded-md">
     <View className="flex-row items-start justify-between">
       <View>
         <Text className="text-black text-lg">

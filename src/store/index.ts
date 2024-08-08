@@ -3,6 +3,7 @@ import rideRequestDetailsReducer from './reducers/RideRequestDetailsSlice';
 import processBookingReducer from './reducers/ProcessBookingSlice';
 import locationSlice from './reducers/LocationSlice';
 import nearBySlice from './reducers/NearbySlice';
+import dialogSlice from './reducers/DialogSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     processBooking: processBookingReducer,
     location: locationSlice,
     nearBy: nearBySlice,
+    dialog: dialogSlice,
   },
 });
 
