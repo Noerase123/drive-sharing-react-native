@@ -31,6 +31,8 @@ import {
   selectedDrive,
 } from '../store/reducers/NearbySlice';
 import {setDialog} from '../store/reducers/DialogSlice';
+import useTimer from '../hooks/useTimer';
+import { msToTime } from '../utils/time';
 
 export type Props = {
   getMarkerPosition: (props: TMockData['pickupLocation']) => void;
@@ -51,15 +53,34 @@ export const CustomBottomSheet = ({
 }: Props) => {
   const navigation = useNavigate();
   const dispatch = useDispatch();
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const rideDetails = useSelector(getDetails);
   const {status} = useSelector(getStatus);
-
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [booked, setBooked] = useState(false);
+
+  const {
+    resetTimer,
+    accepted,
+    pickedUp,
+    started
+  } = useTimer();
 
   useEffect(() => {
     bottomSheetModalRef.current?.present();
   }, []);
+
+  useEffect(() => {
+    if (status === 'dropped-off') {
+      dispatch(setData({
+        ...rideDetails,
+        timer: {
+          accepted: msToTime(accepted * 1000), 
+          started: msToTime(started * 1000), 
+          pickedUp: msToTime(pickedUp * 1000), 
+        }
+      }))
+    }
+  }, [status]);
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
@@ -117,6 +138,7 @@ export const CustomBottomSheet = ({
     setSelectedCustomer(undefined);
     getMarkerPosition(rideDetails.pickupLocation);
     dispatch(refreshList());
+    resetTimer();
   };
 
   const handleArrivedBooking = () => {
@@ -156,6 +178,7 @@ export const CustomBottomSheet = ({
     dispatch(refreshList());
     setSelectedCustomer(undefined);
     setBooked(false);
+    resetTimer();
   };
 
   const mapIcons = [

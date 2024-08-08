@@ -21,6 +21,11 @@ export type TMockData = {
   destination: TCoordinates;
   destinationAddress: string;
   expectedArrivalTime: string;
+  timer?: {
+    accepted: string;
+    started: string;
+    pickedUp: string;
+  }
   status: TStatus;
   pickupTime: string;
   timestamp: string;

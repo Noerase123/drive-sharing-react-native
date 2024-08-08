@@ -5,14 +5,15 @@ import {
   Text,
   Image,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import React, {useRef, useState, useLayoutEffect} from 'react';
 import MapView, {
   Callout,
   Circle,
   Marker,
-  PROVIDER_GOOGLE,
-  PROVIDER_DEFAULT,
+  // PROVIDER_GOOGLE,
+  // PROVIDER_DEFAULT,
 } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import {CustomBottomSheet} from '../components/BottomSheet';
@@ -33,11 +34,11 @@ import Modal from 'react-native-modal';
 import {getDialog, removeDialog} from '../store/reducers/DialogSlice';
 import {cn} from '../utils';
 import {getStatus} from '../store/reducers/ProcessBookingSlice';
-import { setData } from '../store/reducers/RideRequestDetailsSlice';
+import { getDetails, setData } from '../store/reducers/RideRequestDetailsSlice';
 
 const screenHeight = Dimensions.get('window').height;
 
-// const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY || '';
+// const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
 export function HomeScreen() {
   const navigation = useNavigate();
@@ -48,6 +49,7 @@ export function HomeScreen() {
   >(undefined);
   const [snapPoint, setSnapPoint] = useState(0);
   const mapRef = useRef<MapView>(null);
+  const rideDetails = useSelector(getDetails);
   const {isVisible, color, title, description} = useSelector(getDialog);
 
   const location = useBooking({mapRef});
@@ -102,9 +104,9 @@ export function HomeScreen() {
       <View className="relative h-screen w-full">
         <MapView
           ref={mapRef}
-          provider={
-            Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
-          }
+          // provider={
+          //   Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
+          // }
           onMapReady={getPosition}
           followsUserLocation
           showsUserLocation
@@ -188,6 +190,37 @@ export function HomeScreen() {
               <Text className="text-lg text-gray-500">
                 {description || 'Are you sure you want to cancel booking?'}
               </Text>
+              {status === 'completed' && (
+                <View className='mt-5'>
+                  <Text className="text-lg text-black font-semibold">
+                    Ride duration
+                  </Text>
+                  <View className='flex-row items-center justify-between'>
+                    <Text className="text-lg text-gray-500">
+                      Accepted ride
+                    </Text>
+                    <Text className="text-lg text-black">
+                      {rideDetails.timer?.accepted}
+                    </Text>
+                  </View>
+                  <View className='flex-row items-center justify-between'>
+                    <Text className="text-lg text-gray-500">
+                      Picked-up customer
+                    </Text>
+                    <Text className="text-lg text-black">
+                      {rideDetails.timer?.pickedUp}
+                    </Text>
+                  </View>
+                  <View className='flex-row items-center justify-between'>
+                    <Text className="text-lg text-gray-500">
+                      Drive duration
+                    </Text>
+                    <Text className="text-lg text-black">
+                      {rideDetails.timer?.started}
+                    </Text>
+                  </View>
+                </View>
+              )}
               <View className="w-full mt-5">
                 <TouchableOpacity onPress={handleRemoveDialog}>
                   <View
