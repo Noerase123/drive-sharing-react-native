@@ -1,4 +1,8 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Drive-sharing Project by John Isaac
+
+## screenshot/video of the app
+
+![drive-sharing](https://github.com/user-attachments/assets/24034c64-23a7-41e4-a4e2-aa3637bb0760)
 
 # Getting Started
 
