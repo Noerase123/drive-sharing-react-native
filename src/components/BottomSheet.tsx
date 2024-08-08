@@ -25,6 +25,7 @@ import {
   ChevUpIcon,
 } from '../assets/icons';
 import {
+  changeStatus,
   refreshList,
   removeData,
   selectedDrive,
@@ -34,6 +35,7 @@ import {setDialog} from '../store/reducers/DialogSlice';
 export type Props = {
   getMarkerPosition: (props: TMockData['pickupLocation']) => void;
   setSnapPoint: (payload: any) => void;
+  handleCustomer: (payload: any) => void;
   snapPoint: number;
   selectedCustomer: TMockData | undefined;
   setSelectedCustomer: (payload: any) => void;
@@ -43,6 +45,7 @@ export const CustomBottomSheet = ({
   getMarkerPosition,
   snapPoint,
   setSnapPoint,
+  handleCustomer,
   selectedCustomer,
   setSelectedCustomer,
 }: Props) => {
@@ -67,13 +70,6 @@ export const CustomBottomSheet = ({
     } else if (index === 0) {
       setSnapPoint(0);
     }
-  };
-
-  const handleCustomer = (data: TMockData) => () => {
-    getMarkerPosition(data.pickupLocation);
-    setSnapPoint(1);
-    dispatch(setData(data));
-    setSelectedCustomer(data);
   };
 
   const handleNavigateDetails = (data: TMockData) => () => {
@@ -109,6 +105,12 @@ export const CustomBottomSheet = ({
         description: 'Customer will be notify about the cancellation.',
       }),
     );
+    dispatch(
+      changeStatus({
+        id: rideDetails.id,
+        status: 'declined',
+      }),
+    );
     setSnapPoint(1);
     dispatch(setPending());
     setBooked(false);
@@ -138,7 +140,6 @@ export const CustomBottomSheet = ({
   const handleDroppedOff = () => {
     dispatch(setDroppedOff());
     getMarkerPosition(rideDetails.destination);
-    dispatch(refreshList());
   };
 
   const handleCompleted = () => {
@@ -152,7 +153,7 @@ export const CustomBottomSheet = ({
       }),
     );
     dispatch(setCompleted());
-    dispatch(removeData(rideDetails));
+    dispatch(refreshList());
     setSelectedCustomer(undefined);
     setBooked(false);
   };
@@ -270,7 +271,7 @@ export const CustomBottomSheet = ({
         />
       );
     } else {
-      return <NearbyList onPress={handleCustomer} />;
+      return <NearbyList onPress={data => handleCustomer(data)} />;
     }
   }, [selectedCustomer, status]);
 

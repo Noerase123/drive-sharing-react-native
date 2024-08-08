@@ -53,10 +53,6 @@ export function RideRequestDetails() {
       value: 'destinationAddress',
     },
     {
-      label: 'Pick-up address',
-      value: 'pickupAddress',
-    },
-    {
       label: 'From your distance to customer arrival time',
       value: 'pickupTime',
     },

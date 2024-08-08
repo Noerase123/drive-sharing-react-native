@@ -17,7 +17,7 @@ import MapView, {
 import Geolocation from '@react-native-community/geolocation';
 import {CustomBottomSheet} from '../components/BottomSheet';
 import {TCoordinates, TMockData} from '../types/MockData';
-import MapViewDirections from 'react-native-maps-directions';
+// import MapViewDirections from 'react-native-maps-directions';
 import {useNavigate} from '../hooks/useNavigation';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch} from '../store';
@@ -32,10 +32,12 @@ import {useBooking} from '../hooks/useBooking';
 import Modal from 'react-native-modal';
 import {getDialog, removeDialog} from '../store/reducers/DialogSlice';
 import {cn} from '../utils';
+import {getStatus} from '../store/reducers/ProcessBookingSlice';
+import { setData } from '../store/reducers/RideRequestDetailsSlice';
 
 const screenHeight = Dimensions.get('window').height;
 
-const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY || '';
+// const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY || '';
 
 export function HomeScreen() {
   const navigation = useNavigate();
@@ -50,6 +52,7 @@ export function HomeScreen() {
 
   const location = useBooking({mapRef});
   const rideList = useLocationServiceAPI();
+  const {status} = useSelector(getStatus);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -84,8 +87,10 @@ export function HomeScreen() {
   };
 
   const setCustomer = (data: TMockData) => {
-    setSelectedCustomer(data);
+    getMarkerPosition(data.pickupLocation);
     setSnapPoint(1);
+    dispatch(setData(data));
+    setSelectedCustomer(data);
   };
 
   const handleRemoveDialog = () => {
@@ -141,31 +146,34 @@ export function HomeScreen() {
                   </View>
                 </Callout>
               </Marker>
-              <Marker
-                coordinate={data.destination}
-                pinColor="#FF5733"
-                identifier={'destination'}>
-                <Callout>
-                  <View>
-                    <Text className="text-black">
-                      {data.destinationAddress}
-                    </Text>
-                    <View className="flex-row justify-center">
-                      <Image
-                        source={require('../assets/images/building.png')}
-                        style={{width: 100, height: 100, objectFit: 'cover'}}
-                      />
-                    </View>
-                  </View>
-                </Callout>
-              </Marker>
             </View>
           ))}
+          {['dropped-off', 'started'].includes(status) ? (
+            <Marker
+              coordinate={rideList[0].destination}
+              pinColor="#FF5733"
+              identifier={'destination'}>
+              <Callout>
+                <View>
+                  <Text className="text-black">
+                    {rideList[0].destinationAddress}
+                  </Text>
+                  <View className="flex-row justify-center">
+                    <Image
+                      source={require('../assets/images/building.png')}
+                      style={{width: 100, height: 100, objectFit: 'cover'}}
+                    />
+                  </View>
+                </View>
+              </Callout>
+            </Marker>
+          ) : null}
         </MapView>
         <CustomBottomSheet
           getMarkerPosition={getMarkerPosition}
           snapPoint={snapPoint}
           setSnapPoint={setSnapPoint}
+          handleCustomer={setCustomer}
           selectedCustomer={selectedCustomer}
           setSelectedCustomer={setSelectedCustomer}
         />

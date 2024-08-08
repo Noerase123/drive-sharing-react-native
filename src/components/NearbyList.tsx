@@ -7,7 +7,7 @@ import {getList} from '../store/reducers/NearbySlice';
 import {randomDistance} from '../utils/distance';
 
 type Props = {
-  onPress: (data: TMockData) => () => void;
+  onPress: (data: TMockData) => void;
 };
 
 export default function NearbyList({onPress}: Props) {
@@ -20,7 +20,7 @@ export default function NearbyList({onPress}: Props) {
         {nearByList.map((item, idx) => {
           for (const num of [0.3, 0.6, 0.9]) {
             return (
-              <TouchableOpacity key={idx} onPress={onPress(item)}>
+              <TouchableOpacity key={idx} onPress={() => onPress(item)}>
                 <ItemListDetails
                   data={item}
                   distance={Number(distance(num, idx)).toFixed(2)}
