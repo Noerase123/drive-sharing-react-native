@@ -4,8 +4,6 @@ import {
   Dimensions,
   Text,
   Image,
-  TouchableOpacity,
-  ScrollView,
 } from 'react-native';
 import React, {useRef, useState, useLayoutEffect} from 'react';
 import MapView, {
@@ -18,7 +16,7 @@ import MapView, {
 import Geolocation from '@react-native-community/geolocation';
 import {CustomBottomSheet} from '../components/BottomSheet';
 import {TCoordinates, TMockData} from '../types/MockData';
-// import MapViewDirections from 'react-native-maps-directions';
+import MapViewDirections from 'react-native-maps-directions';
 import {useNavigate} from '../hooks/useNavigation';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch} from '../store';
@@ -30,15 +28,13 @@ import {
 } from '../store/reducers/LocationSlice';
 import {useLocationServiceAPI} from '../services/locationService';
 import {useBooking} from '../hooks/useBooking';
-import Modal from 'react-native-modal';
-import {getDialog, removeDialog} from '../store/reducers/DialogSlice';
-import {cn} from '../utils';
 import {getStatus} from '../store/reducers/ProcessBookingSlice';
-import { getDetails, setData } from '../store/reducers/RideRequestDetailsSlice';
+import { setData } from '../store/reducers/RideRequestDetailsSlice';
+import { CustomModal } from '../components/Modal';
 
 const screenHeight = Dimensions.get('window').height;
 
-// const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY || '...';
 
 export function HomeScreen() {
   const navigation = useNavigate();
@@ -49,8 +45,6 @@ export function HomeScreen() {
   >(undefined);
   const [snapPoint, setSnapPoint] = useState(0);
   const mapRef = useRef<MapView>(null);
-  const rideDetails = useSelector(getDetails);
-  const {isVisible, color, title, description} = useSelector(getDialog);
 
   const location = useBooking({mapRef});
   const rideList = useLocationServiceAPI();
@@ -95,10 +89,6 @@ export function HomeScreen() {
     setSelectedCustomer(data);
   };
 
-  const handleRemoveDialog = () => {
-    dispatch(removeDialog());
-  };
-
   return (
     <BottomSheetModalProvider>
       <View className="relative h-screen w-full">
@@ -122,15 +112,7 @@ export function HomeScreen() {
           />
           {rideList.map((data, idx) => (
             <View key={idx}>
-              {/* {openDirections && (
-                <MapViewDirections
-                  origin={data.pickupLocation}
-                  destination={data.destination}
-                  apikey={GOOGLE_PLACES_API_KEY}
-                  strokeColor="hotpink"
-                  strokeWidth={4}
-                />
-              )} */}
+            
               <Marker
                 coordinate={data.pickupLocation}
                 pinColor="#89CFF0"
@@ -150,6 +132,15 @@ export function HomeScreen() {
               </Marker>
             </View>
           ))}
+          {status === 'started' && (
+            <MapViewDirections
+              origin={rideList[0].pickupLocation}
+              destination={rideList[0].destination}
+              apikey={GOOGLE_PLACES_API_KEY}
+              strokeColor="hotpink"
+              strokeWidth={4}
+            />
+          )}
           {['dropped-off', 'started'].includes(status) ? (
             <Marker
               coordinate={rideList[0].destination}
@@ -179,64 +170,7 @@ export function HomeScreen() {
           selectedCustomer={selectedCustomer}
           setSelectedCustomer={setSelectedCustomer}
         />
-        <Modal isVisible={isVisible}>
-          <View className="bg-white rounded-lg overflow-hidden">
-            <View className={cn('bg-blue-500 px-5 py-3', color)}>
-              <Text className="text-xl text-white font-bold">
-                {title || 'Cancel the booking'}
-              </Text>
-            </View>
-            <View className="p-5">
-              <Text className="text-lg text-gray-500">
-                {description || 'Are you sure you want to cancel booking?'}
-              </Text>
-              {status === 'completed' && (
-                <View className='mt-5'>
-                  <Text className="text-lg text-black font-semibold">
-                    Ride duration
-                  </Text>
-                  <View className='flex-row items-center justify-between'>
-                    <Text className="text-lg text-gray-500">
-                      Accepted ride
-                    </Text>
-                    <Text className="text-lg text-black">
-                      {rideDetails.timer?.accepted}
-                    </Text>
-                  </View>
-                  <View className='flex-row items-center justify-between'>
-                    <Text className="text-lg text-gray-500">
-                      Picked-up customer
-                    </Text>
-                    <Text className="text-lg text-black">
-                      {rideDetails.timer?.pickedUp}
-                    </Text>
-                  </View>
-                  <View className='flex-row items-center justify-between'>
-                    <Text className="text-lg text-gray-500">
-                      Drive duration
-                    </Text>
-                    <Text className="text-lg text-black">
-                      {rideDetails.timer?.started}
-                    </Text>
-                  </View>
-                </View>
-              )}
-              <View className="w-full mt-5">
-                <TouchableOpacity onPress={handleRemoveDialog}>
-                  <View
-                    className={cn(
-                      'bg-blue-500 px-10 py-2 rounded-full',
-                      color,
-                    )}>
-                    <Text className="text-xl text-white font-bold text-center">
-                      Ok
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
+        <CustomModal />
       </View>
     </BottomSheetModalProvider>
   );
