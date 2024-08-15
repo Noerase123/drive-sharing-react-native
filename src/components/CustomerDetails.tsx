@@ -32,7 +32,7 @@ export const CustomerDetails = ({
     },
     {
       label: 'Payment',
-      value: '$300 USD',
+      value: `$${data.fare} USD`,
     },
   ];
 

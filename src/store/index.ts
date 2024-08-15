@@ -4,6 +4,7 @@ import processBookingReducer from './reducers/ProcessBookingSlice';
 import locationSlice from './reducers/LocationSlice';
 import nearBySlice from './reducers/NearbySlice';
 import dialogSlice from './reducers/DialogSlice';
+import incomeSlice from './reducers/IncomeSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     location: locationSlice,
     nearBy: nearBySlice,
     dialog: dialogSlice,
+    income: incomeSlice,
   },
 });
 

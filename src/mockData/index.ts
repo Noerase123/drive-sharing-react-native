@@ -5,6 +5,7 @@ export const mockData: TMockData[] = [
     id: 'db4ba5f3-2c8c-421f-8c58-ee2336cf92a7',
     userId: 'Carlos Mapua',
     driverId: '27e32b1c-e962-4bb9-8eb9-e2c9be768ec3',
+    fare: 200,
     pickupLocation: {
       latitude: 14.5595269,
       longitude: 121.0413191,
@@ -24,6 +25,7 @@ export const mockData: TMockData[] = [
     id: '17ea9bb8-cc5d-4592-992d-b4691ceb7fe8',
     userId: 'Adrian Abad',
     driverId: '27e32b1c-e962-4bb9-8eb9-e2c9be768ec3',
+    fare: 155,
     pickupLocation: {
       latitude: 14.5546961,
       longitude: 121.0467953,
@@ -43,6 +45,7 @@ export const mockData: TMockData[] = [
     id: 'e356f9b0-0f63-45e0-b230-e60e258fbd89',
     userId: 'Jose Santos',
     driverId: '27e32b1c-e962-4bb9-8eb9-e2c9be768ec3',
+    fare: 125,
     pickupLocation: {
       latitude: 14.5544665,
       longitude: 121.029063,
@@ -62,6 +65,7 @@ export const mockData: TMockData[] = [
     id: 'ced8421a-be18-42bd-b613-1f28d3ccda02',
     userId: 'Edgar Tan',
     driverId: '27e32b1c-e962-4bb9-8eb9-e2c9be768ec3',
+    fare: 340,
     pickupLocation: {
       latitude: 14.5580888,
       longitude: 121.0528552,
@@ -81,6 +85,7 @@ export const mockData: TMockData[] = [
     id: 'f086c8de-050e-4b95-add2-d7fc3c07c018',
     userId: 'Jane Joey',
     driverId: '27e32b1c-e962-4bb9-8eb9-e2c9be768ec3',
+    fare: 300,
     pickupLocation: {
       latitude: 14.5494928,
       longitude: 121.0553566,
@@ -100,6 +105,7 @@ export const mockData: TMockData[] = [
     id: '72562ea5-819c-4d28-afb7-cf551f64d87a',
     userId: 'Mary Idol',
     driverId: '27e32b1c-e962-4bb9-8eb9-e2c9be768ec3',
+    fare: 100,
     pickupLocation: {
       latitude: 14.5536264,
       longitude: 121.0469331,
@@ -119,6 +125,7 @@ export const mockData: TMockData[] = [
     id: '72562ea5-819c-4d28-afb7-cf551f64d87a',
     userId: 'Mary Idol',
     driverId: '27e32b1c-e962-4bb9-8eb9-e2c9be768ec3',
+    fare: 250,
     pickupLocation: {
       latitude: 14.5536264,
       longitude: 121.0469331,
@@ -138,6 +145,7 @@ export const mockData: TMockData[] = [
     id: '72562ea5-819c-4d28-afb7-cf551f64d87a',
     userId: 'Mary Idol',
     driverId: '27e32b1c-e962-4bb9-8eb9-e2c9be768ec3',
+    fare: 250,
     pickupLocation: {
       latitude: 14.5536264,
       longitude: 121.0469331,
@@ -157,6 +165,7 @@ export const mockData: TMockData[] = [
     id: '72562ea5-819c-4d28-afb7-cf551f64d87a',
     userId: 'Mary Idol',
     driverId: '27e32b1c-e962-4bb9-8eb9-e2c9be768ec3',
+    fare: 250,
     pickupLocation: {
       latitude: 14.5536264,
       longitude: 121.0469331,

@@ -5,7 +5,7 @@ import {
   Text,
   Image,
 } from 'react-native';
-import React, {useRef, useState, useLayoutEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import MapView, {
   Callout,
   Circle,
@@ -39,7 +39,6 @@ const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY || '...';
 export function HomeScreen() {
   const navigation = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [openDirections, setOpenDirections] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<
     TMockData | undefined
   >(undefined);
@@ -49,13 +48,6 @@ export function HomeScreen() {
   const location = useBooking({mapRef});
   const rideList = useLocationServiceAPI();
   const {status} = useSelector(getStatus);
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: 'DriveWithMe App',
-      headerTitleAlign: 'center',
-    });
-  }, []);
 
   const getPosition = () => {
     Geolocation.getCurrentPosition(loc => {
@@ -70,7 +62,6 @@ export function HomeScreen() {
 
   const getMarkerPosition = (coors: TCoordinates) => {
     dispatch(setSelectedCustomerLocation(coors));
-    setOpenDirections(true);
     mapRef.current?.animateToRegion({
       latitude: coors.latitude,
       longitude: coors.longitude,

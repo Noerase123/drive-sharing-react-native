@@ -21,6 +21,7 @@ export type TMockData = {
   destination: TCoordinates;
   destinationAddress: string;
   expectedArrivalTime: string;
+  fare: number;
   timer?: {
     accepted: string;
     started: string;
