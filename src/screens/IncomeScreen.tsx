@@ -32,20 +32,20 @@ function IncomeScreen() {
     <ScrollView>
       <View className='bg-white mx-4 mt-4 p-5 shadow rounded-lg'>
         <View className='flex-col gap-2 justify-center items-center'>
-          <Text>Total balance</Text>
+          <Text className='text-black'>Total balance</Text>
           <View className='flex-row items-end gap-x-2'>
-            <Text className='text-lg'>PHP</Text>
-            <Text className='text-3xl'>{listIncome.totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</Text>
+            <Text className='text-lg text-black'>PHP</Text>
+            <Text className='text-3xl text-black'>{listIncome.totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</Text>
           </View>
         </View>
       </View>
       <View className='bg-white mx-4 mt-4 p-5 shadow rounded-lg'>
         <View className='flex-col gap-2'>
-          <Text className='text-lg'>Earning history</Text>
+          <Text className='text-lg text-black'>Earning history</Text>
           {listIncome.data.map((item, idx) => (
             <View className='my-5' key={idx}>
               <View className='flex-row justify-between items-center mb-3'>
-                <Text className='text-lg'>{dayjs(item.dateCreated).format('MM/DD/YYYY')}</Text>
+                <Text className='text-lg text-black'>{dayjs(item.dateCreated).format('MM/DD/YYYY')}</Text>
                 <TouchableOpacity onPress={handleIncomeDetails}>
                   <View className="rotate-180">
                     <BackIcon />
@@ -54,8 +54,8 @@ function IncomeScreen() {
               </View>
               <View>
                 <View className='flex-row justify-between items-center mt-2'>
-                  <Text className='text-lg'>{dayjs(item.dateCreated).format('HH:mm:ss A')}</Text>
-                  <Text className='text-lg'>+{item.earnings.fares.toLocaleString('en-US', { minimumFractionDigits: 2 })}</Text>
+                  <Text className='text-lg text-black'>{dayjs(item.dateCreated).format('HH:mm:ss A')}</Text>
+                  <Text className='text-lg text-black'>+{item.earnings.fares.toLocaleString('en-US', { minimumFractionDigits: 2 })}</Text>
                 </View>
                 <View className='border-t border-gray-300' />
               </View>
