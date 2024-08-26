@@ -34,7 +34,6 @@ import {setDialog} from '../store/reducers/DialogSlice';
 import useTimer from '../hooks/useTimer';
 import { msToTime } from '../utils/time';
 import { addIncome } from '../store/reducers/IncomeSlice';
-import dayjs from 'dayjs';
 
 export type Props = {
   getMarkerPosition: (props: TMockData['pickupLocation']) => void;

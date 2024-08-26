@@ -51,24 +51,24 @@ export function HomeScreen() {
   const {status} = useSelector(getStatus);
 
   const getPosition = () => {
-    // Geolocation.getCurrentPosition(loc => {
-    //   mapRef.current?.animateToRegion({
-    //     latitude: loc.coords.latitude,
-    //     longitude: loc.coords.longitude,
-    //     ...deltaCoordinates,
-    //   });
-    //   dispatch(setCurrentLocation(loc.coords));
-    // });
-    const coords = {
-      latitude: 14.557591,
-      longitude: 121.046458
-    }
-    mapRef.current?.animateToRegion({
-      latitude: coords.latitude,
-      longitude: coords.longitude,
-      ...deltaCoordinates,
+    Geolocation.getCurrentPosition(loc => {
+      mapRef.current?.animateToRegion({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+        ...deltaCoordinates,
+      });
+      dispatch(setCurrentLocation(loc.coords));
     });
-    dispatch(setCurrentLocation(coords));
+    // const coords = {
+    //   latitude: 14.557591,
+    //   longitude: 121.046458
+    // }
+    // mapRef.current?.animateToRegion({
+    //   latitude: coords.latitude,
+    //   longitude: coords.longitude,
+    //   ...deltaCoordinates,
+    // });
+    // dispatch(setCurrentLocation(coords));
   };
 
   const getMarkerPosition = (coors: TCoordinates) => {
@@ -100,20 +100,13 @@ export function HomeScreen() {
             Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
           }
           onMapReady={getPosition}
-          // followsUserLocation
-          // showsUserLocation
+          followsUserLocation
+          showsUserLocation
           region={location.currentLocation}
           style={{
             height: screenHeight - (Platform.OS === 'android' ? 150 : 190),
             width: screenWidth
           }}>
-          {/* <Circle
-            center={location.currentLocation}
-            radius={500}
-            strokeWidth={2}
-            strokeColor="#82eedd"
-            fillColor="#82eedd4d"
-          /> */}
           {rideList.map((data, idx) => (
             <View key={idx}>
             

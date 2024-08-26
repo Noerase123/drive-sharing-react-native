@@ -1,4 +1,4 @@
-import {View, Text, ScrollView} from 'react-native';
+import {View, Text, ScrollView, TouchableOpacity} from 'react-native';
 import React, {useLayoutEffect, useRef} from 'react';
 import {useNavigate} from '../hooks/useNavigation';
 import {useSelector} from 'react-redux';
@@ -6,6 +6,7 @@ import {getDetails} from '../store/reducers/RideRequestDetailsSlice';
 import MapView, {Marker} from 'react-native-maps';
 import {deltaCoordinates} from '../constants';
 import {TMockData} from '../types/MockData';
+import { BackIcon } from '../assets/icons';
 
 type TMapValues = {
   label: string;
@@ -17,9 +18,11 @@ export function RideRequestDetails() {
   const data: any = useSelector(getDetails);
   const mapRef = useRef<MapView>(null);
 
+  const handleBack = () => navigation.goBack();
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: 'Request Details',
+      headerShown: false
     });
   }, []);
 
@@ -64,6 +67,14 @@ export function RideRequestDetails() {
 
   return (
     <ScrollView className="bg-white">
+      <View className='ml-3 my-3'>
+        <TouchableOpacity onPress={handleBack}>
+          <View className='flex-row items-center'>
+            <BackIcon />
+            <Text className='text-md'>back to Dashboard</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
       <MapView
         followsUserLocation
         showsUserLocation
