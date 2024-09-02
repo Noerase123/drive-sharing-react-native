@@ -1,7 +1,5 @@
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, ScrollView, SafeAreaView } from 'react-native';
 import React from 'react';
-import { useNavigate } from '../hooks/useNavigation';
-import { BackIcon } from '../assets/icons';
 
 const mockDetails = {
   dateCreated: '09/22/2024 12:42 pm',
@@ -42,22 +40,11 @@ const mockDetails = {
 };
 
 export function IncomeDetailsScreen() {
-  const navigation = useNavigate();
-  const handleGoBack = () => navigation.goBack();
-
   const { earnings, deductions } = mockDetails.overall;
 
   return (
     <SafeAreaView>
       <ScrollView>
-        <View className='ml-5 mt-5'>
-          <TouchableOpacity onPress={handleGoBack}>
-            <View className='flex-row items-center'>
-              <BackIcon />
-              <Text className='text-md'>back</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
         <View className='bg-white mx-4 mt-4 p-5 shadow rounded-lg'>
           <Text className='text-lg'>09/22/2024 12:42 pm</Text>
           <View className='p-2'>

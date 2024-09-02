@@ -1,5 +1,5 @@
 import {View, Text, ScrollView, TouchableOpacity} from 'react-native';
-import React, {useLayoutEffect, useRef} from 'react';
+import React, {useRef} from 'react';
 import {useNavigate} from '../hooks/useNavigation';
 import {useSelector} from 'react-redux';
 import {getDetails} from '../store/reducers/RideRequestDetailsSlice';
@@ -19,12 +19,6 @@ export function RideRequestDetails() {
   const mapRef = useRef<MapView>(null);
 
   const handleBack = () => navigation.goBack();
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false
-    });
-  }, []);
 
   const getPosition = () => {
     mapRef.current?.animateToRegion({
@@ -67,14 +61,6 @@ export function RideRequestDetails() {
 
   return (
     <ScrollView className="bg-white">
-      <View className='ml-3 my-3'>
-        <TouchableOpacity onPress={handleBack}>
-          <View className='flex-row items-center'>
-            <BackIcon />
-            <Text className='text-md'>back to Dashboard</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
       <MapView
         followsUserLocation
         showsUserLocation
