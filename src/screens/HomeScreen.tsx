@@ -14,7 +14,6 @@ import MapView, {
   PROVIDER_DEFAULT,
 } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
-import {CustomBottomSheet} from '../components/BottomSheet';
 import {TCoordinates, TMockData} from '../types/MockData';
 import MapViewDirections from 'react-native-maps-directions';
 import {useNavigate} from '../hooks/useNavigation';
