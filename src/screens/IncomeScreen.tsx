@@ -2,27 +2,10 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import React from 'react';
 import {useNavigate} from '../hooks/useNavigation';
 import { BackIcon } from '../assets/icons';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { IncomeDetailsScreen } from './IncomeDetailsScreen';
 import { useIncomeServiceAPI } from '../services/incomeService';
 import dayjs from 'dayjs';
 
-const Stack = createNativeStackNavigator();
-
-export function MainIncomeScreen() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="IncomeScreen" component={IncomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen
-        name="IncomeDetails"
-        component={IncomeDetailsScreen}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
-  )
-}
-
-function IncomeScreen() {
+export function IncomeScreen() {
   const navigation = useNavigate();
   const listIncome = useIncomeServiceAPI();
   
