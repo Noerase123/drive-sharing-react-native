@@ -31,6 +31,7 @@ import {useBooking} from '../hooks/useBooking';
 import {getStatus} from '../store/reducers/ProcessBookingSlice';
 import { setData } from '../store/reducers/RideRequestDetailsSlice';
 import { CustomModal } from '../components/Modal';
+import { CustomerBottomSheet } from '../components/customer/CustomerBottomSheet';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -51,24 +52,24 @@ export function HomeScreen() {
   const {status} = useSelector(getStatus);
 
   const getPosition = () => {
-    // Geolocation.getCurrentPosition(loc => {
-    //   mapRef.current?.animateToRegion({
-    //     latitude: loc.coords.latitude,
-    //     longitude: loc.coords.longitude,
-    //     ...deltaCoordinates,
-    //   });
-    //   dispatch(setCurrentLocation(loc.coords));
-    // });
-    const coords = {
-      latitude: 14.557591,
-      longitude: 121.046458
-    }
-    mapRef.current?.animateToRegion({
-      latitude: coords.latitude,
-      longitude: coords.longitude,
-      ...deltaCoordinates,
+    Geolocation.getCurrentPosition(loc => {
+      mapRef.current?.animateToRegion({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+        ...deltaCoordinates,
+      });
+      dispatch(setCurrentLocation(loc.coords));
     });
-    dispatch(setCurrentLocation(coords));
+    // const coords = {
+    //   latitude: 14.557591,
+    //   longitude: 121.046458
+    // }
+    // mapRef.current?.animateToRegion({
+    //   latitude: coords.latitude,
+    //   longitude: coords.longitude,
+    //   ...deltaCoordinates,
+    // });
+    // dispatch(setCurrentLocation(coords));
   };
 
   const getMarkerPosition = (coors: TCoordinates) => {
@@ -100,23 +101,15 @@ export function HomeScreen() {
             Platform.OS === 'android' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
           }
           onMapReady={getPosition}
-          // followsUserLocation
-          // showsUserLocation
+          followsUserLocation
+          showsUserLocation
           region={location.currentLocation}
           style={{
             height: screenHeight - (Platform.OS === 'android' ? 150 : 190),
             width: screenWidth
           }}>
-          {/* <Circle
-            center={location.currentLocation}
-            radius={500}
-            strokeWidth={2}
-            strokeColor="#82eedd"
-            fillColor="#82eedd4d"
-          /> */}
-          {rideList.map((data, idx) => (
+          {/* {rideList.map((data, idx) => (
             <View key={idx}>
-            
               <Marker
                 coordinate={data.pickupLocation}
                 pinColor="#89CFF0"
@@ -135,8 +128,8 @@ export function HomeScreen() {
                 </Callout>
               </Marker>
             </View>
-          ))}
-          {status === 'started' && (
+          ))} */}
+          {/* {status === 'started' && (
             <MapViewDirections
               origin={rideList[0].pickupLocation}
               destination={rideList[0].destination}
@@ -144,8 +137,8 @@ export function HomeScreen() {
               strokeColor="hotpink"
               strokeWidth={4}
             />
-          )}
-          {['dropped-off', 'started'].includes(status) ? (
+          )} */}
+          {/* {['dropped-off', 'started'].includes(status) ? (
             <Marker
               coordinate={rideList[0].destination}
               pinColor="#FF5733"
@@ -164,9 +157,9 @@ export function HomeScreen() {
                 </View>
               </Callout>
             </Marker>
-          ) : null}
+          ) : null} */}
         </MapView>
-        <CustomBottomSheet
+        <CustomerBottomSheet
           getMarkerPosition={getMarkerPosition}
           snapPoint={snapPoint}
           setSnapPoint={setSnapPoint}
