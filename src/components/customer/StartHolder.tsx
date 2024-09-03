@@ -1,5 +1,8 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
+import { useSelector } from 'react-redux';
+import { getCustomer } from '../../store/reducers/CustomerSlice';
+import { cn } from '../../utils';
 
 type TStartHolder = {
   onPickupLocation: () => void;
@@ -35,19 +38,24 @@ export function PickupDestinationPanel({
   onPickupLocation,
   onDestinationLocation
 }: Omit<TStartHolder, 'onBookNow'>) {
+  const customer = useSelector(getCustomer);
   return (
     <View className='flex-col gap-y-3'>
       <TouchableOpacity onPress={onPickupLocation}>
         <View className='border-2 p-3 rounded-lg border-gray-400'>
-          <Text className='text-lg font-medium text-gray-500'>
-            Enter Pick-up location
+          <Text className={cn('text-lg font-medium text-gray-500', {
+            'text-black': customer?.pickupLocation
+          })}>
+            {customer?.pickupLocation?.name || 'Enter Pick-up location'}
           </Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity onPress={onDestinationLocation}>
         <View className='border-2 p-3 rounded-lg border-gray-400'>
-          <Text className='text-lg font-medium text-gray-500'>
-            Enter Destination location
+          <Text className={cn('text-lg font-medium text-gray-500', {
+            'text-black': customer?.destinationLocation
+          })}>
+            {customer?.destinationLocation?.name || 'Enter Destination location'}
           </Text>
         </View>
       </TouchableOpacity>

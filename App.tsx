@@ -18,7 +18,7 @@ function DrawerNavigation(): React.JSX.Element {
   return (
     <Drawer.Navigator initialRouteName='Home'>
       <Drawer.Screen name="Home" component={HomeScreen} />
-      <Drawer.Screen name='Income' component={IncomeScreen} />
+      <Drawer.Screen name='History' component={IncomeScreen} options={{ title: 'Ride history' }} />
       <Drawer.Screen name='MyProfile' component={MyProfile} options={{ title: "My Profile" }} />
     </Drawer.Navigator>
   );

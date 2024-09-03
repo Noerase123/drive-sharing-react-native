@@ -1,11 +1,6 @@
-import React, {useCallback, useRef, useEffect, useMemo, useState} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
-import {BottomSheetModal, BottomSheetView} from '@gorhom/bottom-sheet';
+import React from 'react';
+import {View} from 'react-native';
 import {TMockData} from '../../types/MockData';
-import {useSelector} from 'react-redux';
-import {
-  getStatus,
-} from '../../store/reducers/ProcessBookingSlice';
 import { StartHolder } from './StartHolder';
 import { useNavigate } from '../../hooks/useNavigation';
 
@@ -18,61 +13,21 @@ export type Props = {
   setSelectedCustomer: (payload: any) => void;
 };
 
-export const CustomerBottomSheet = ({
-  snapPoint,
-  setSnapPoint,
-}: Props) => {
+export const CustomerBottomSheet = (props: Props) => {
   const navigation = useNavigate();
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const {status} = useSelector(getStatus);
-
-  useEffect(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
-
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
-
-  const handleSheetChanges = (index: number) => {
-    setSnapPoint(index);
-  };
-
-  const handleLocationSelect = () => {
-    // setSnapPoint(1);
-    navigation.navigate('PickupLocation');
+  const handleLocationSelect = (type: 'pickup' | 'destination') => () => {
+    navigation.navigate('PickupLocation', { type });
   }
-
-  const renderSheet = useMemo(() => {
-    return (
-      <StartHolder
-        onPickupLocation={handleLocationSelect}
-        onDestinationLocation={handleLocationSelect}
-        onBookNow={() => {}}
-      />
-    );
-  }, [status]);
 
   return (
     <View>
-      <TouchableOpacity className="bg-white" onPress={handlePresentModalPress}>
-        <View className="p-5 flex-row justify-center">
-          <Text className="text-black font-medium text-2xl px-5">
-            Select Nearby
-          </Text>
-        </View>
-      </TouchableOpacity>
-      <BottomSheetModal
-        ref={bottomSheetModalRef}
-        index={snapPoint}
-        snapPoints={['35%', '95%']}
-        onChange={handleSheetChanges}>
-        <BottomSheetView>
-          <View className='px-5'>
-            {renderSheet}
-          </View>
-        </BottomSheetView>
-      </BottomSheetModal>
+      <View className='px-5 pt-5 pb-10 bg-white'>
+        <StartHolder
+          onPickupLocation={handleLocationSelect('pickup')}
+          onDestinationLocation={handleLocationSelect('destination')}
+          onBookNow={() => {}}
+        />
+      </View>
     </View>
   );
 };

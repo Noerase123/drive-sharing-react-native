@@ -5,7 +5,7 @@ type NavigationScreenProps = {
   RideRequestDetails: undefined;
   IncomeScreen: undefined;
   IncomeDetails: undefined;
-  PickupLocation: undefined;
+  PickupLocation: { type: 'pickup' | 'destination'; } | undefined;
 };
 
 export type Navigation = StackScreenProps<NavigationScreenProps>['navigation'];

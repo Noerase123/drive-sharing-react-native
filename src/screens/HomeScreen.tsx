@@ -5,7 +5,7 @@ import {
   Text,
   Image,
 } from 'react-native';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import MapView, {
   Callout,
   Circle,
@@ -22,15 +22,15 @@ import {AppDispatch} from '../store';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {deltaCoordinates} from '../constants';
 import {
+  getLocation,
   setCurrentLocation,
   setSelectedCustomerLocation,
 } from '../store/reducers/LocationSlice';
-import {useLocationServiceAPI} from '../services/locationService';
 import {useBooking} from '../hooks/useBooking';
-import {getStatus} from '../store/reducers/ProcessBookingSlice';
 import { setData } from '../store/reducers/RideRequestDetailsSlice';
 import { CustomModal } from '../components/Modal';
 import { CustomerBottomSheet } from '../components/customer/CustomerBottomSheet';
+import { getCustomer } from '../store/reducers/CustomerSlice';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -38,7 +38,6 @@ const screenWidth = Dimensions.get('window').width;
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY || '...';
 
 export function HomeScreen() {
-  const navigation = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [selectedCustomer, setSelectedCustomer] = useState<
     TMockData | undefined
@@ -46,9 +45,8 @@ export function HomeScreen() {
   const [snapPoint, setSnapPoint] = useState(0);
   const mapRef = useRef<MapView>(null);
 
-  const location = useBooking({mapRef});
-  const rideList = useLocationServiceAPI();
-  const {status} = useSelector(getStatus);
+  const location = useSelector(getLocation);
+  const customer = useSelector(getCustomer);
 
   const getPosition = () => {
     Geolocation.getCurrentPosition(loc => {
@@ -80,9 +78,33 @@ export function HomeScreen() {
     });
   };
 
-  const handleCallout = () => {
-    navigation.navigate('RideRequestDetails');
+  const readyForBooking = () => {
+    const { pickupLocation, destinationLocation } = customer;
+    mapRef.current?.animateToRegion({
+      ...pickupLocation,
+      ...deltaCoordinates,
+    });
+    mapRef.current?.fitToCoordinates([pickupLocation, destinationLocation], {
+      edgePadding: {
+        top: 75,
+        bottom: 75,
+        left: 75,
+        right: 75,
+      },
+    });
   };
+
+  useEffect(() => {
+    if (customer?.pickupLocation) {
+      mapRef.current?.animateToRegion({
+        ...customer.pickupLocation,
+        ...deltaCoordinates,
+      });
+    }
+    if (customer?.destinationLocation) {
+      readyForBooking();
+    }
+  }, [customer]);
 
   const setCustomer = (data: TMockData) => {
     getMarkerPosition(data.pickupLocation);
@@ -104,48 +126,36 @@ export function HomeScreen() {
           showsUserLocation
           region={location.currentLocation}
           style={{
-            height: screenHeight - (Platform.OS === 'android' ? 150 : 190),
+            height: screenHeight - (Platform.OS === 'android' ? 150 : 350),
             width: screenWidth
           }}>
-          {/* {rideList.map((data, idx) => (
-            <View key={idx}>
-              <Marker
-                coordinate={data.pickupLocation}
-                pinColor="#89CFF0"
-                identifier={'pickupLocation'}
-                onPress={() => setCustomer(data)}>
-                <Callout onPress={handleCallout}>
-                  <View>
-                    <Text className="text-black">{data.pickupAddress}</Text>
-                    <View className="flex-row justify-center">
-                      <Image
-                        source={require('../assets/images/building.png')}
-                        style={{width: 100, height: 100, objectFit: 'cover'}}
-                      />
-                    </View>
-                  </View>
-                </Callout>
-              </Marker>
-            </View>
-          ))} */}
-          {/* {status === 'started' && (
-            <MapViewDirections
-              origin={rideList[0].pickupLocation}
-              destination={rideList[0].destination}
-              apikey={GOOGLE_PLACES_API_KEY}
-              strokeColor="hotpink"
-              strokeWidth={4}
-            />
-          )} */}
-          {/* {['dropped-off', 'started'].includes(status) ? (
+          {customer?.pickupLocation ? (
             <Marker
-              coordinate={rideList[0].destination}
+              coordinate={customer.pickupLocation}
+              pinColor="#89CFF0"
+              identifier={'pickupLocation'}>
+              <Callout>
+                <View>
+                  <Text className="text-black">{customer?.pickupLocation?.address}</Text>
+                  <View className="flex-row justify-center">
+                    <Image
+                      source={require('../assets/images/building.png')}
+                      style={{width: 100, height: 100, objectFit: 'cover'}}
+                    />
+                  </View>
+                </View>
+              </Callout>
+            </Marker>
+          ) : null}
+          {customer?.destinationLocation ? (
+            <Marker
+              coordinate={customer.destinationLocation}
               pinColor="#FF5733"
               identifier={'destination'}>
               <Callout>
                 <View>
                   <Text className="text-black">
-                    {rideList[0].destinationAddress}
+                    {customer?.destinationLocation.address}
                   </Text>
                   <View className="flex-row justify-center">
                     <Image
@@ -156,7 +166,7 @@ export function HomeScreen() {
                 </View>
               </Callout>
             </Marker>
-          ) : null} */}
+          ) : null}
         </MapView>
         <CustomerBottomSheet
           getMarkerPosition={getMarkerPosition}

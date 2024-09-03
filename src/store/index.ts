@@ -5,6 +5,7 @@ import locationSlice from './reducers/LocationSlice';
 import nearBySlice from './reducers/NearbySlice';
 import dialogSlice from './reducers/DialogSlice';
 import incomeSlice from './reducers/IncomeSlice';
+import customerSlice from './reducers/CustomerSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     nearBy: nearBySlice,
     dialog: dialogSlice,
     income: incomeSlice,
+    customer: customerSlice
   },
 });
 
